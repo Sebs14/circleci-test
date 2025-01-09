@@ -15,7 +15,9 @@ jobs:
             npm run build
       - run:
           name: Install AWS CLI
-          command: sudo apt install awscli
+          command: |
+            sudo apt-get update
+            sudo apt install awscli
       - run:
           name: Deploy to S3
           command: |
