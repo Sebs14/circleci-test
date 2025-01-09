@@ -26,7 +26,7 @@ export default function Home() {
         <>
           <h1 className=' -lg text-3xl font-bold text-white'>
             Clases de <span className='text-violet-950'>Matematicas</span>{' '}
-            gratis
+            diferenciales
           </h1>
         </>
       )}
