@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-deploy:
     docker:
-      - image: circleci/node:16
+      - image: circleci/node:23.5.0
     steps:
       - checkout
       - run:
