@@ -18,7 +18,7 @@ export default function Home() {
       {loading ? (
         <>
           <svg
-            className='animate-spin h-24 w-24 rounded-full border-t-blue-600 border-8 border-dotted border '
+            className='animate-spin h-24 w-24 rounded-full border-t-blue-600 border-8 border-dotted '
             viewBox='0 0 24 24'
           ></svg>
         </>
@@ -26,7 +26,7 @@ export default function Home() {
         <>
           <h1 className=' -lg text-3xl font-bold text-white'>
             Clases de <span className='text-violet-950'>Matematicas</span>{' '}
-            gratis
+            diferenciales
           </h1>
         </>
       )}
