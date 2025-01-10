@@ -1,30 +1,108 @@
 version: 2.1
 
+parameters:
+  environment:
+    type: enum
+    default: develop
+    enum: [develop, staging, production]
+
 jobs:
-  build-and-deploy:
-    docker:
-      - image: cimg/node:20.11.0
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Build and Export Next.js App
-          command: |
-            npm run build
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update
-            sudo apt install awscli
-      - run:
-          name: Deploy to S3
-          command: |
-            aws s3 sync ./out s3://test-circleci-cikume --delete
+  deploy:
+    docker: cimg/node:20.11.0
+  parameters:
+  environment:
+    type: enum
+    default: develop
+    enum: [develop, staging, production]
+  steps:
+    - checkout
+    - run:
+        name: Install Dependencies
+        command: npm install
+    - run:
+        name: Build and Export Next.js App
+        command: |
+          npm run build
+    - run:
+        name: Install AWS CLI
+        command: |
+          sudo apt-get update
+          sudo apt install awscli
+    - run:
+        name: Deploy to S3
+        command: |
+          case "<<parameters.environment>>" in
+            "production")
+              BUCKET_NAME="prod-circleci-cikume"
+              ;;
+            "staging")
+              BUCKET_NAME="staging-circleci-cikume"
+              ;;
+            *)
+              BUCKET_NAME="test-circleci-cikume"
+              ;;
+          esac
+          echo "Using bucket: $BUCKET_NAME"
+          aws s3 sync ./out s3://$BUCKET_NAME --delete
+
+  # build-and-deploy-dev:
+  #   docker:
+  #     - image: cimg/node:20.11.0
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install Dependencies
+  #         command: npm install
+  #     - run:
+  #         name: Build and Export Next.js App
+  #         command: |
+  #           npm run build
+  #     - run:
+  #         name: Install AWS CLI
+  #         command: |
+  #           sudo apt-get update
+  #           sudo apt install awscli
+  #     - run:
+  #         name: Deploy to S3
+  #         command: |
+  #           aws s3 sync ./out s3://test-circleci-cikume --delete
+  # build-and-deploy-prod:
+  #   docker:
+  #     - image: cimg/node:20.11.0
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install Dependencies
+  #         command: npm install
+  #     - run:
+  #         name: Build and Export Next.js App
+  #         command: |
+  #           npm run build
+  #     - run:
+  #         name: Install AWS CLI
+  #         command: |
+  #           sudo apt-get update
+  #           sudo apt install awscli
+  #     - run:
+  #         name: Deploy to S3
+  #         command: |
+  #           aws s3 sync ./out s3://prod-circleci-cikume --delete
 
 workflows:
   version: 2
-  deploy:
-    jobs:
-      - build-and-deploy
+  jobs:
+    - deploy:
+        environment: develop
+        filters:
+          branches:
+            only: [develop]
+    - deploy:
+        environment: staging
+        filters:
+          branches:
+            only: [staging]
+    - deploy:
+        environment: production
+        filters:
+          branches:
+            only: [main]
