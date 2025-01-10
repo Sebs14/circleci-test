@@ -9,36 +9,36 @@ parameters:
 jobs:
   deploy:
     docker: cimg/node:20.11.0
-  parameters:
-    environment:
-      type: enum
-      default: develop
-      enum: [develop, staging, production]
-  steps:
-    - checkout
-    - run:
-        name: Install Dependencies
-        command: npm install
-    - run:
-        name: Build and Export Next.js App
-        command: |
-          npm run build
-    - run:
-        name: Install AWS CLI
-        command: |
-          sudo apt-get update
-          sudo apt install awscli
-    - run:
-        name: Deploy to S3
-        command: |
-          if [ <<parameters.environment>> == "production" ]; then
-            BUCKET_NAME="prod-circleci-cikume"
-          elif [ <<parameters.environment>> == "staging" ]; then
-            BUCKET_NAME="staging-circleci-cikume"
-          else
-            BUCKET_NAME="test-circleci-cikume"
-          fi
-          aws s3 sync ./out s3://$BUCKET_NAME --delete
+    parameters:
+      environment:
+        type: enum
+        default: develop
+        enum: [develop, staging, production]
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Build and Export Next.js App
+          command: |
+            npm run build
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt install awscli
+      - run:
+          name: Deploy to S3
+          command: |
+            if [ <<parameters.environment>> == "production" ]; then
+              BUCKET_NAME="prod-circleci-cikume"
+            elif [ <<parameters.environment>> == "staging" ]; then
+              BUCKET_NAME="staging-circleci-cikume"
+            else
+              BUCKET_NAME="test-circleci-cikume"
+            fi
+            aws s3 sync ./out s3://$BUCKET_NAME --delete
 
   # build-and-deploy-dev:
   #   docker:
