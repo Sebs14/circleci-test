@@ -27,6 +27,9 @@ export default function Home() {
           <h1 className=' -lg text-3xl font-bold text-white'>
             Clases de <span className='text-violet-950'>Matematicas</span>{' '}
             diferenciales
+            <div className='bg-blue-500 w-full h-10 flex flex-1 items-center justify-center'>
+              <h3>solo sos paja maitro</h3>
+            </div>
           </h1>
         </>
       )}
