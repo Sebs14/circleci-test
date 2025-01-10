@@ -1,19 +1,8 @@
 version: 2.1
 
-parameters:
-  environment:
-    type: enum
-    default: develop
-    enum: [develop, staging, production]
-
 jobs:
   deploy:
     docker: cimg/node:20.11.0
-  parameters:
-  environment:
-    type: enum
-    default: develop
-    enum: [develop, staging, production]
   steps:
     - checkout
     - run:
@@ -29,17 +18,17 @@ jobs:
           sudo apt-get update
           sudo apt install awscli
     - run:
-          name: Deploy to S3
-          command: |
-            if [ <<parameters.environment>> == "production" ]; then
-              BUCKET_NAME="prod-circleci-cikume"
-            elif [ <<parameters.environment>> == "staging" ]; then
-              BUCKET_NAME="staging-circleci-cikume"
-            else
-              BUCKET_NAME="test-circleci-cikume"
-            fi
-            aws s3 sync ./out s3://$BUCKET_NAME --delete
-    
+        name: Deploy to S3
+        command: |
+          if [ <<parameters.environment>> == "production" ]; then
+            BUCKET_NAME="prod-circleci-cikume"
+          elif [ <<parameters.environment>> == "staging" ]; then
+            BUCKET_NAME="staging-circleci-cikume"
+          else
+            BUCKET_NAME="test-circleci-cikume"
+          fi
+          aws s3 sync ./out s3://$BUCKET_NAME --delete
+
   # build-and-deploy-dev:
   #   docker:
   #     - image: cimg/node:20.11.0
@@ -86,19 +75,18 @@ jobs:
 workflows:
   version: 2
   jobs:
-      - deploy:
-          environment: develop
-          filters:
-            branches:
-              only: [develop]
-      - deploy:
-          environment: staging
-          filters:
-            branches:
-              only: [staging]
-      - deploy:
-          environment: production
-          filters:
-            branches:
-              only: [main]
-
+    - deploy:
+        environment: develop
+        filters:
+          branches:
+            only: [develop]
+    - deploy:
+        environment: staging
+        filters:
+          branches:
+            only: [staging]
+    - deploy:
+        environment: production
+        filters:
+          branches:
+            only: [main]
