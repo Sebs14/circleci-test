@@ -24,7 +24,7 @@ jobs:
             aws s3 sync ./out s3://$S3_BUCKET_NAME --delete
 
 workflows:
-  version: 2
+  version: 2.1
   deploy:
     jobs:
       - build-and-deploy:
