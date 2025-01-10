@@ -9,26 +9,26 @@ parameters:
 jobs:
   deploy:
     docker: cimg/node:20.11.0
-    parameters:
-      environment:
-        type: enum
-        default: develop
-        enum: [develop, staging, production]
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Build and Export Next.js App
-          command: |
-            npm run build
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update
-            sudo apt install awscli
-      - run:
+  parameters:
+  environment:
+    type: enum
+    default: develop
+    enum: [develop, staging, production]
+  steps:
+    - checkout
+    - run:
+        name: Install Dependencies
+        command: npm install
+    - run:
+        name: Build and Export Next.js App
+        command: |
+          npm run build
+    - run:
+        name: Install AWS CLI
+        command: |
+          sudo apt-get update
+          sudo apt install awscli
+    - run:
           name: Deploy to S3
           command: |
             if [ <<parameters.environment>> == "production" ]; then
@@ -39,7 +39,7 @@ jobs:
               BUCKET_NAME="test-circleci-cikume"
             fi
             aws s3 sync ./out s3://$BUCKET_NAME --delete
-
+    
   # build-and-deploy-dev:
   #   docker:
   #     - image: cimg/node:20.11.0
@@ -86,21 +86,19 @@ jobs:
 workflows:
   version: 2
   jobs:
-    - deploy:
-        context: develop
-        environment: develop
-        filters:
-          branches:
-            only: [develop]
-    - deploy:
-        context: staging
-        environment: staging
-        filters:
-          branches:
-            only: [staging]
-    - deploy:
-        context: production
-        environment: production
-        filters:
-          branches:
-            only: [main]
+      - deploy:
+          environment: develop
+          filters:
+            branches:
+              only: [develop]
+      - deploy:
+          environment: staging
+          filters:
+            branches:
+              only: [staging]
+      - deploy:
+          environment: production
+          filters:
+            branches:
+              only: [main]
+
