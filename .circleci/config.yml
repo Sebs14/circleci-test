@@ -29,4 +29,6 @@ workflows:
     jobs:
       - build-and-deploy:
           context: develop
-          branches: develop
+           branches:
+              only:
+                - main
