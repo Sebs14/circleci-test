@@ -77,9 +77,6 @@ workflows:
   version: 2
   jobs:
     - build-and-deploy-dev
-      filters:
-        branches:
-          only: [develop]
     # - deploy:
     #     environment: develop
     #     filters:
