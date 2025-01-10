@@ -33,3 +33,9 @@ workflows:
               only:
                 - develop
           context: develop
+      - build-and-deploy:
+          filters:
+            branches:
+              only:
+                - main
+          context: production
