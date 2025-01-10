@@ -1,36 +1,7 @@
 version: 2.1
 
 jobs:
-  deploy:
-    docker: 
-      - image: cimg/node:20.11.0
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Build and Export Next.js App
-          command: |
-            npm run build
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update
-            sudo apt install awscli
-      - run:
-          name: Deploy to S3
-          command: |
-            if [ <<parameters.environment>> == "production" ]; then
-              BUCKET_NAME="prod-circleci-cikume"
-            elif [ <<parameters.environment>> == "staging" ]; then
-              BUCKET_NAME="staging-circleci-cikume"
-            else
-              BUCKET_NAME="test-circleci-cikume"
-            fi
-            aws s3 sync ./out s3://$BUCKET_NAME --delete
-
-  # build-and-deploy-dev:
+  # deploy:
   #   docker:
   #     - image: cimg/node:20.11.0
   #   steps:
@@ -50,7 +21,36 @@ jobs:
   #     - run:
   #         name: Deploy to S3
   #         command: |
-  #           aws s3 sync ./out s3://test-circleci-cikume --delete
+  #           if [ <<parameters.environment>> == "production" ]; then
+  #             BUCKET_NAME="prod-circleci-cikume"
+  #           elif [ <<parameters.environment>> == "staging" ]; then
+  #             BUCKET_NAME="staging-circleci-cikume"
+  #           else
+  #             BUCKET_NAME="test-circleci-cikume"
+  #           fi
+  #           aws s3 sync ./out s3://$BUCKET_NAME --delete
+
+  build-and-deploy-dev:
+    docker:
+      - image: cimg/node:20.11.0
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Build and Export Next.js App
+          command: |
+            npm run build
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt install awscli
+      - run:
+          name: Deploy to S3
+          command: |
+            aws s3 sync ./out s3://test-circleci-cikume --delete
   # build-and-deploy-prod:
   #   docker:
   #     - image: cimg/node:20.11.0
@@ -76,18 +76,22 @@ jobs:
 workflows:
   version: 2
   jobs:
-    - deploy:
-        environment: develop
-        filters:
-          branches:
-            only: [develop]
-    - deploy:
-        environment: staging
-        filters:
-          branches:
-            only: [staging]
-    - deploy:
-        environment: production
-        filters:
-          branches:
-            only: [main]
+    - build-and-deploy-dev
+      filters:
+        branches:
+          only: [develop]
+    # - deploy:
+    #     environment: develop
+    #     filters:
+    #       branches:
+    #         only: [develop]
+    # - deploy:
+    #     environment: staging
+    #     filters:
+    #       branches:
+    #         only: [staging]
+    # - deploy:
+    #     environment: production
+    #     filters:
+    #       branches:
+    #         only: [main]
