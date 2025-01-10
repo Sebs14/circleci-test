@@ -21,10 +21,21 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            aws s3 sync ./out s3://test-circleci-cikume --delete
+            aws s3 sync ./out s3://$S3_BUCKET_NAME --delete
 
 workflows:
-  version: 2
+  version: 2.1
   deploy:
     jobs:
-      - build-and-deploy
+      - build-and-deploy:
+          filters:
+            branches:
+              only:
+                - develop
+          context: develop
+      - build-and-deploy:
+          filters:
+            branches:
+              only:
+                - main
+          context: production
