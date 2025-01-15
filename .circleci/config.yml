@@ -33,9 +33,11 @@ workflows:
               only:
                 - develop
           context: develop
+      hold:
+        type: approval
+        requires:
+          - build-and-deploy
       - build-and-deploy:
           filters:
-            branches:
-              only:
-                - main
           context: production
+  
