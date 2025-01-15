@@ -22,6 +22,27 @@ jobs:
           name: Deploy to S3
           command: |
             aws s3 sync ./out s3://$S3_BUCKET_NAME --delete
+  build-and-deploy-prod:
+    docker:
+      - image: cimg/node:20.11.0
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Build and Export Next.js App
+          command: |
+            npm run build
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt install awscli
+      - run:
+          name: Deploy to S3
+          command: |
+            aws s3 sync ./out s3://$S3_BUCKET_NAME --delete
 
 workflows:
   version: 2.1
